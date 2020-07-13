@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f274599fd414f10b96055d49d0c60ec, type: 3}
+  m_Name: GameSettings
+  m_EditorClassIdentifier: 
+  EnemyConfig:
+    FieldOfViewPrefab: {fileID: 9184482617397153569, guid: 193243ae4a7ca864d8f9510b74e4a738,
+      type: 3}
+    AggroRadius: 4
+    AttackRange: 3
+    ProjectilePrefab: {fileID: 1218724716591446, guid: c4b4b81382c254a999d09f9375fbe2c7,
+      type: 3}
+    Fov: 90
+    ViewDistance: 3
+    RayCount: 100
+    BasicMovementSpeed: 1
+    AwareMovementSpeed: 1.75
+    ChasingMovementSpeed: 2.5
+    LayerMask:
+      serializedVersion: 2
+      m_Bits: 512
+    StopDistance: 1
+    RayDistance: 1.5
+    ChaseTime: 4
+    SpawnRate: 0.1
