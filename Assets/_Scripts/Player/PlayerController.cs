@@ -1,6 +1,5 @@
 ﻿using Enemies;
 using Managers;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityStandardAssets.Characters.ThirdPerson;
@@ -65,9 +64,9 @@ namespace Player
 
             if (enemy != null)
             {
+                _levelManager.RegisterEnemyDeath(enemy);
+
                 Destroy(enemy.gameObject);
-                
-                _levelManager.RegisterEnemyDeath();
             }
         }
     }

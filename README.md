@@ -3,8 +3,12 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Creating copy of the orignal game - Hunter Assasin. 
-Time Spent working on Initial Commit - ~40h.
+Time Spent working on :
+ - Initial Commit - ~40h.
+ - Improved Wander state... - ~10h.
 
+[Link to Build](https://we.tl/t-xWsXS2ZL9A)
+ 
 ---
 ### **External tools or assets**
 

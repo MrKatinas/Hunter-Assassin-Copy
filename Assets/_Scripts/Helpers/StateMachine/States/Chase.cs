@@ -13,19 +13,19 @@ namespace Helpers.StateMachine.States
     {
         // References
         private readonly Enemy _enemy;
+        private readonly CustomMovementController _movementController;
         private readonly NavMeshAgent _navMeshAgent;
-        private readonly ThirdPersonCharacter _character;
         private readonly Enemy.Config _enemyConfig;
         private readonly Animator _animator;
 
         private readonly float _chaseTime;
         private float _timer = 0f;
 
-        public Chase(Enemy enemy, NavMeshAgent navMeshAgent, ThirdPersonCharacter character, Animator animator)
+        public Chase(Enemy enemy, CustomMovementController movementController, NavMeshAgent navMeshAgent, Animator animator)
         {
             _enemy = enemy;
             _navMeshAgent = navMeshAgent;
-            _character = character;
+            _movementController = movementController;
             _animator = animator;
             
             _enemyConfig = GameSettings.Get.EnemyConfig;
@@ -43,7 +43,7 @@ namespace Helpers.StateMachine.States
             _navMeshAgent.speed = _enemyConfig.AwareMovementSpeed;
             
             _navMeshAgent.SetDestination(_enemy.transform.position);
-            _character.Move(_navMeshAgent.desiredVelocity, false, false);
+            _movementController.Move(_navMeshAgent.desiredVelocity);
             
             _animator.SetFloat("Strafe", 0);
             _animator.SetFloat("Forward", 0);
@@ -61,7 +61,7 @@ namespace Helpers.StateMachine.States
             
             // Moves to enemy.
             _navMeshAgent.SetDestination(_enemy.Player.transform.position);
-            _character.Move(_navMeshAgent.desiredVelocity, false, false);
+            _movementController.Move(_navMeshAgent.desiredVelocity);
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using Enemies;
 using Helpers.SceneManagement;
 using UnityEngine;
 
@@ -26,16 +28,18 @@ namespace Managers
         }
 
         #endregion
-
-        /// <summary>
-        /// Enemy count that is alive in current scene
-        /// </summary>
-        [SerializeField] private int _enemyCount;
         
         /// <summary>
         /// Player transform that is accessible to enemies.
         /// </summary>
-        public Transform PlayerTransform;
+        [HideInInspector] public Transform PlayerTransform;
+
+        /// <summary>
+        /// Enemy count that is alive in current scene
+        /// </summary>
+        private readonly List<Enemy> _enemies = new List<Enemy>();
+        
+        
         
         private void Awake()
         {
@@ -43,22 +47,23 @@ namespace Managers
             _levelManagerInstance = this;
         }
 
-        public void RegisterNewEnemy()
+        public void RegisterNewEnemy(Enemy enemy)
         {
-            _enemyCount++; 
+            _enemies.Add(enemy);
             
             // Update UI.
             LevelUiManager.Get.IncreaseEnemyCount();
         }
 
-        public void RegisterEnemyDeath()
+        public void RegisterEnemyDeath(Enemy enemy)
         {
-            _enemyCount--;
+            _enemies.Remove(enemy);
+            NotifyEnemies();
             
             // Update UI.
             LevelUiManager.Get.IncreaseKilledEnemyCount();
             
-            if (_enemyCount <= 0)
+            if (_enemies.Count <= 0)
             {
                 CustomSceneManager.Get.NextLevel();
             }
@@ -72,6 +77,14 @@ namespace Managers
             StartCoroutine(SwitchLevel());
             
             Time.timeScale = 0.2f;
+        }
+        
+        public void NotifyEnemies()
+        {
+            foreach (var enemy in _enemies)
+            {
+                enemy.IsChasing = true;
+            }
         }
 
         private IEnumerator SwitchLevel()

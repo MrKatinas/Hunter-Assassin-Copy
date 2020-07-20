@@ -15,10 +15,10 @@ MonoBehaviour:
   EnemyConfig:
     FieldOfViewPrefab: {fileID: 9184482617397153569, guid: 193243ae4a7ca864d8f9510b74e4a738,
       type: 3}
-    AggroRadius: 4
-    AttackRange: 3
     ProjectilePrefab: {fileID: 1218724716591446, guid: c4b4b81382c254a999d09f9375fbe2c7,
       type: 3}
+    AggroRadius: 4
+    AttackRange: 3
     Fov: 90
     ViewDistance: 3
     RayCount: 100
@@ -30,5 +30,9 @@ MonoBehaviour:
       m_Bits: 512
     StopDistance: 1
     RayDistance: 1.5
+    MinTimeUntilScouting: 10
+    MaxTimeUntilScouting: 40
     ChaseTime: 4
     SpawnRate: 0.1
+    TurnTime: 4
+    RotateAngle: 180

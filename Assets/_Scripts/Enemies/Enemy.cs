@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using Helpers;
 using Helpers.Settings;
 using Helpers.StateMachine;
 using Helpers.StateMachine.States;
@@ -15,9 +17,8 @@ namespace Enemies
         [HideInInspector] public Transform Target;
         [HideInInspector] public Transform Player;
         [HideInInspector] public bool IsChasing;
+        [HideInInspector] public bool IsScouting;
         
-        // TODO initialize FieldOfView on awake.
-        [SerializeField] private GameObject _fieldOfViewPrefab; 
         [SerializeField] private bool _isStatic;
         
         [Header("For Projectile spawn")]
@@ -28,6 +29,7 @@ namespace Enemies
         private StateMachine _stateMachine;
         private Config _enemyConfig;
         private FieldOfView _fieldOfView;
+        private LevelManager _levelManager;
 
         
         private void Awake()
@@ -42,19 +44,30 @@ namespace Enemies
             var navMeshAgent = GetComponent<NavMeshAgent>();
             var character = GetComponent<ThirdPersonCharacter>();
             var animator = GetComponent<Animator>();
+            var movementController = GetComponent<CustomMovementController>();
 
             // Create wanted states.
             var staticState = new StaticState();
-            var wander = new Wander(this, navMeshAgent, character, animator);
-            var chase = new Chase(this, navMeshAgent, character, animator);
+            var wander = new Wander(this, movementController, navMeshAgent, animator);
+            var chase = new Chase(this, movementController, navMeshAgent, animator);
             var attack = new Attack(this);
+            var scouting = new Scouting(this, animator);
             
             // Assign state transitions
             void At(IState from, IState to, Func<bool> condition) => _stateMachine.AddTransition(from, to, condition);
+            
+            // TODO Move attack state to any state 
 
             At(staticState, wander, NotStatic());
             
             At(wander, attack, FoundPlayer());
+            At(wander, scouting, Scouting());
+            At(wander, chase, ChasingPlayer());
+            
+            At(scouting, attack, FoundPlayer());
+            At(scouting, wander, ScoutingFinished());
+            At(scouting, chase, ChasingPlayer());
+            
             At(attack, chase, ChasingPlayer());
             
             At(chase, attack, FoundPlayer());
@@ -65,15 +78,22 @@ namespace Enemies
             
             // Transition logic between states.
             Func<bool> NotStatic() => () => !_isStatic;
+            
             Func<bool> FoundPlayer() => () => Target != null;
+            
             Func<bool> ChasingPlayer() => () => IsChasing;
             Func<bool> NotChasingPlayer() => () => !IsChasing;
+            
+            Func<bool> Scouting() => () => IsScouting;
+            Func<bool> ScoutingFinished() => () => !IsScouting;
         }
         
         private void Start()
         {
+            _levelManager = LevelManager.Get;
+            
             // Register Enemy to LevelManager
-            LevelManager.Get.RegisterNewEnemy();
+            _levelManager.RegisterNewEnemy(this);
             
             _stateMachine.Tick();
         }
@@ -132,6 +152,8 @@ namespace Enemies
         public void SpawnProjectile()
         {
             Instantiate(_enemyConfig.ProjectilePrefab, _bulletSpawnPoint.position, _bulletSpawnPoint.rotation);
+            
+            _levelManager.NotifyEnemies();
 
             if(_bulletSpawnParticles)
                 _bulletSpawnParticles.Play();
@@ -156,6 +178,11 @@ namespace Enemies
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 6f * Time.deltaTime);
         }
 
+        public void CustomStartCoroutine(IEnumerator coroutine)
+        {
+            StartCoroutine(coroutine);
+        }
+
         private void OnDestroy()
         {
             if (_fieldOfView != null)
@@ -168,11 +195,10 @@ namespace Enemies
         public class Config
         {
             public GameObject FieldOfViewPrefab;
+            public GameObject ProjectilePrefab;
             
             public float AggroRadius = 4f;
             public float AttackRange = 3f;
-
-            public GameObject ProjectilePrefab;
             
             [Header("FieldOfView")]
              public float Fov = 90f; 
@@ -189,12 +215,20 @@ namespace Enemies
             [Header("Wander State")]
             public float StopDistance = 1f;
             public float RayDistance = 1.5f;
+            
+            // Min and Max times until enemy enters scouting state
+            public float MinTimeUntilScouting = 10f;
+            public float MaxTimeUntilScouting = 30f;
 
             [Header("Chase State")] 
             public float ChaseTime = 4f;
             
             [Header("Attack State")] 
             public float SpawnRate = 0.1f;
+            
+            [Header("Scouting State")] 
+            public float TurnTime = 1f;
+            public int RotateAngle = 180;
         }
     }
 }

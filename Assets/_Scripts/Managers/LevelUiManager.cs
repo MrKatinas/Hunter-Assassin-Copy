@@ -41,7 +41,6 @@ namespace Managers
         private void Awake()
         {
             _levelUiManagerInstance = this;
-            
             UpdateEnemyCountText();
         }
 
